@@ -1,15 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PeliculasAPIs.Entidades
+namespace PeliculasAPIs.DTOs
 {
-    public class Actor
+    public class ActorPatchDTO
     {
-        public int Id { get; set; }
         [Required]
         [StringLength(120)]
         public string Nombre { get; set; } = string.Empty;
         public DateTime FechaNacimiento { get; set; }
-        public string? Foto { get; set; } 
-        public List<PeliculasActores> PeliculasActores { get; set; }
     }
 }

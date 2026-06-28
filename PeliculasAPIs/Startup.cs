@@ -14,10 +14,26 @@ namespace PeliculasAPIs
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(typeof(Startup));
+
             services.AddControllers();
-            services.AddTransient<AlmacenadorArchivoAzure, AlmacenadorArchivoAzure>();
+            services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivoAzure>();
+            services.AddHttpContextAccessor(); 
+
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaulConnection")));
+
+            services.AddControllers().AddNewtonsoftJson();
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .WithExposedHeaders("cantidadPaginas");
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -27,6 +43,7 @@ namespace PeliculasAPIs
                 app.UseDeveloperExceptionPage();
             }
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
