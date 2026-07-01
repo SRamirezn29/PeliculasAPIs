@@ -5,11 +5,11 @@ namespace PeliculasAPIs.Helpers
 {
     public class TypeBinder<T>: IModelBinder
     {
-        public Task BindMOdelAsync(ModelBindingContext bindingContext)
+        public Task BindModelAsync(ModelBindingContext bindingContext)  
         {
             var nombrePropiedad = bindingContext.ModelName;
             var proveedorDeValores = bindingContext.ValueProvider.GetValue(nombrePropiedad);
-            if(proveedorDeValores == ValueProviderResult.None)
+            if (proveedorDeValores == ValueProviderResult.None)
             {
                 return Task.CompletedTask;
             }
@@ -25,11 +25,6 @@ namespace PeliculasAPIs.Helpers
             }
 
             return Task.CompletedTask;
-        }
-
-        public Task BindModelAsync(ModelBindingContext bindingContext)
-        {
-            throw new NotImplementedException();
         }
     }
 }

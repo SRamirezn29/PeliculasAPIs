@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PeliculasAPIs.Entidades
 {
-    public class Pelicula
+    public class Pelicula : IId
     {
         public int Id { get; set; }
         [Required]
@@ -12,7 +12,7 @@ namespace PeliculasAPIs.Entidades
         public bool EnCines { get; set; }
         public DateTime FechaEstreno { get; set; }
         public string Poster { get; set; } = string.Empty;
-        public List<PeliculasActores> PeliculasActores { get; set; }
-        public List<PeliculasGenero> PeliculasGeneros { get; set; }
+        public List<PeliculasActores> PeliculasActores { get; set; } = new();
+        public List<PeliculasGenero> PeliculasGeneros { get; set; } = new();
     }
 }

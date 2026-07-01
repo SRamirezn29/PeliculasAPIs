@@ -20,11 +20,42 @@ namespace PeliculasAPIs.Helpers
             CreateMap<PeliculaCreacionDTO, Pelicula>()
                 .ForMember(p => p.Poster, options => options.Ignore())
                 .ForMember(p => p.PeliculasGeneros, options => options.MapFrom(MapPeliculasGeneros))
-                .ForMember(p => p.PeliculasActores, options => options.MapFrom());
+                .ForMember(p => p.PeliculasActores, options => options.MapFrom(MapPeliculasActores));
 
-
+            CreateMap<Pelicula, PeliculaDetallesDTO>()
+                .ForMember(x => x.Generos, options => options.MapFrom(MapPeliculasGeneros))
+                .ForMember(x => x.Actores, options => options.MapFrom(MapPeliculasActores));
 
             CreateMap<PeliculaPachDTO, Pelicula>().ReverseMap();
+        }
+
+
+        private List<ActorPeliculaDetalleDTO> MapPeliculasActores(Pelicula pelicula, PeliculaDetallesDTO detalles)
+        {
+            var resultado = new List<ActorPeliculaDetalleDTO>();
+            if (pelicula.PeliculasActores == null) { return resultado; }
+            foreach (var actorPelicula in pelicula.PeliculasActores)
+            {
+                resultado.Add(new ActorPeliculaDetalleDTO 
+                { 
+                    ActorId = actorPelicula.ActorId,
+                    Personaje = actorPelicula.Personaje,
+                    NombrePersona = actorPelicula.Actor.Nombre
+                });
+            }
+            return resultado;
+        }
+
+
+        private List<GeneroDTO> MapPeliculasGeneros(Pelicula pelicula, PeliculaDetallesDTO peliculaDetallesDTO)
+        {
+            var resultado = new List<GeneroDTO>();
+            if (pelicula.PeliculasGeneros == null) { return resultado; }
+            foreach (var generoPelicula in pelicula.PeliculasGeneros)
+            {
+                resultado.Add(new GeneroDTO() { Id = generoPelicula.GeneroId, Nombre = generoPelicula.Genero.Nombre });
+            }
+            return resultado;
         }
 
         private List<PeliculasGenero> MapPeliculasGeneros(PeliculaCreacionDTO peliculaCreacionDTO, Pelicula pelicula)

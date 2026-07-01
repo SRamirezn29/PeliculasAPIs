@@ -7,22 +7,28 @@ using PeliculasAPIs.Entidades;
 using PeliculasAPIs.Helpers;
 using PeliculasAPIs.Migrations;
 using PeliculasAPIs.Servicios;
+using System.Linq.Dynamic.Core;
 
 namespace PeliculasAPIs.Controllers
 {
     [ApiController]
     [Route("api/peliculas")]
-    public class PelicuasController : ControllerBase
+    public class PelicuasController : CustomBaseController
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly ILogger<PelicuasController> logger;
         private readonly string contenedor = "peliculas";
-        public PelicuasController(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos)
+        
+        public PelicuasController(ApplicationDbContext context,
+            IMapper mapper, IAlmacenadorArchivos almacenadorArchivos,
+            ILogger<PelicuasController> logger) : base (context, mapper)
         {
             this.context = context;
             this.mapper = mapper;
             this.almacenadorArchivos = almacenadorArchivos;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -77,6 +83,22 @@ namespace PeliculasAPIs.Controllers
                     .Contains(filtroPeliculaDTO.GeneroId));
             }
 
+            if(!string.IsNullOrEmpty(filtroPeliculaDTO.CampoOrdenar))
+            {
+                if(filtroPeliculaDTO.CampoOrdenar == "Titulo")
+                {
+                    var tipoOrden = filtroPeliculaDTO.OrdenAscendente ? "ascending" : "descending";
+                    try
+                    {
+                        peliculaQueryable = peliculaQueryable.OrderBy($"{filtroPeliculaDTO.CampoOrdenar} {tipoOrden}");
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex.Message, ex);
+                    }
+                }
+            }
+
             await HttpContext.InsertarParametrosPaginacion(peliculaQueryable,
                 filtroPeliculaDTO.CantidadRegistroPorPagina);
 
@@ -87,15 +109,19 @@ namespace PeliculasAPIs.Controllers
 
 
 
-        [HttpGet("{id}", Name = "obtenerPelicula")]
-        public async Task<ActionResult<PeliculaDTO>> Get(int id)
+        [HttpGet("{id:int}", Name = "obtenerPelicula")]
+        public async Task<ActionResult<PeliculaDetallesDTO>> Get(int id)
         {
-            var pelicula = await context.Peliculas.FirstOrDefaultAsync(x => x.Id == id);
+            var pelicula = await context.Peliculas
+                .Include(x => x.PeliculasActores).ThenInclude(x => x.Actor)
+                .Include(x => x.PeliculasGeneros).ThenInclude(x => x.Genero)
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (pelicula == null)
             {
                 return NotFound();
             }
-            return mapper.Map<PeliculaDTO>(pelicula);
+            pelicula.PeliculasActores = pelicula.PeliculasActores.OrderBy(x => x.Orden).ToList();
+            return mapper.Map<PeliculaDetallesDTO>(pelicula);
         }
 
         [HttpPost]
@@ -115,7 +141,6 @@ namespace PeliculasAPIs.Controllers
                 }
             }
             AsignarOrdenActores(pelicula);
-            context.Add(pelicula);
             context.Add(pelicula);
             await context.SaveChangesAsync();
             var peliculaDTO = mapper.Map<PeliculaDTO>(pelicula);
@@ -165,40 +190,13 @@ namespace PeliculasAPIs.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<PeliculaPachDTO> patchDocument)
         {
-            if (patchDocument == null)
-            {
-                return BadRequest();
-            }
-            var entidadDB = await context.Peliculas.FirstOrDefaultAsync(a => a.Id == id);
-
-            if (entidadDB == null)
-            {
-                return NotFound();
-            }
-            var entidadDTO = mapper.Map<PeliculaPachDTO>(entidadDB);
-            patchDocument.ApplyTo(entidadDTO, ModelState);
-            var isValid = TryValidateModel(entidadDTO);
-
-            if (!isValid)
-            {
-                return BadRequest(ModelState);
-            }
-            mapper.Map(entidadDTO, entidadDB);
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Patch<Pelicula, PeliculaPachDTO>(id, patchDocument);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await context.Peliculas.AnyAsync(a => a.Id == id);
-            if (!existe)
-            {
-                return NotFound();
-            }
-            context.Remove(new Pelicula { Id = id });
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Delete<Pelicula>(id);
         }
     }
 }

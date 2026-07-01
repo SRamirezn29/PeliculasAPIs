@@ -2,7 +2,7 @@
 {
     public class PeliculasIndexDTO
     {
-        public List<PeliculaDTO> FuturosEstrenos { get; set; }
-        public List<PeliculaDTO> EnCines { get; set; }
+        public List<PeliculaDTO> FuturosEstrenos { get; set; } = new();
+        public List<PeliculaDTO> EnCines { get; set; } = new();
     }
 }
