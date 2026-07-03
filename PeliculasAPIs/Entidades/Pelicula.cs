@@ -14,5 +14,6 @@ namespace PeliculasAPIs.Entidades
         public string Poster { get; set; } = string.Empty;
         public List<PeliculasActores> PeliculasActores { get; set; } = new();
         public List<PeliculasGenero> PeliculasGeneros { get; set; } = new();
+        public List<PeliculasSalasDeCine> PeliculasSalasDeCine { get; set; } = new();
     }
 }
