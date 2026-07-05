@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using PeliculasAPIs.Entidades;
 using PeliculasAPIs.Migrations;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace PeliculasAPIs
 {
@@ -27,6 +29,44 @@ namespace PeliculasAPIs
 
         public void SeedData(ModelBuilder modelBuilder)
         {
+            var rolAdmindId = "fecfa021-77d5-4ee9-999f-cc2c74498dbf";
+            var usuarioAdminId = "1cdf717d-838a-46bd-9a13-a8274fe47a08";
+
+            var rolAdmin = new IdentityRole()
+            {
+                Id = rolAdmindId,
+                Name = "admin",
+                NormalizedName = "admin"
+            };
+
+            var passwordHasher = new PasswordHasher<IdentityUser>();
+            var username = "felipe@hotmail.com";
+
+            var usuarioAdmin = new IdentityUser()
+            {
+                Id = usuarioAdminId,
+                UserName = "admin",
+                NormalizedUserName = "admin",
+                Email = "admin@example.com",
+                NormalizedEmail = "admin@example.com",
+                PasswordHash = passwordHasher.HashPassword(null, "Password123!")
+            };
+
+            //modelBuilder.Entity<IdentityUser>()
+            //    .HasData(usuarioAdmin);
+
+            //modelBuilder.Entity<IdentityRole>()
+            //    .HasData(rolAdmin);
+
+            //modelBuilder.Entity<IdentityUserClaim<string>>()
+            //    .HasData(new IdentityUserClaim<string>()
+            //    {
+            //            Id = 1,
+            //            ClaimType = ClaimTypes.Role,
+            //            UserId = usuarioAdminId,
+            //            ClaimValue = "admin"
+            //    });
+
             var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
             modelBuilder.Entity<SalaDeCine>()
            .HasData(new List<SalaDeCine>

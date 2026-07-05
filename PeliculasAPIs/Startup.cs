@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using PeliculasAPIs.Helpers;
 using PeliculasAPIs.Servicios;
+using System.Text;
 
 namespace PeliculasAPIs
 {
@@ -39,6 +43,28 @@ namespace PeliculasAPIs
                 sqlServerOptions => sqlServerOptions.UseNetTopologySuite()
                 ));
 
+
+            services.AddControllers()
+                .AddNewtonsoftJson();
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+              .AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddDefaultTokenProviders();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+               .AddJwtBearer(options =>
+                   options.TokenValidationParameters = new TokenValidationParameters
+                   {
+                       ValidateIssuer = false,
+                       ValidateAudience = false,
+                       ValidateLifetime = true,
+                       ValidateIssuerSigningKey = true,
+                       IssuerSigningKey = new SymmetricSecurityKey(
+                   Encoding.UTF8.GetBytes(Configuration["jwt:key"])),
+                       ClockSkew = TimeSpan.Zero
+                   }
+               );
+
             services.AddControllers().AddNewtonsoftJson();
 
             services.AddCors(options =>
@@ -62,6 +88,7 @@ namespace PeliculasAPIs
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
