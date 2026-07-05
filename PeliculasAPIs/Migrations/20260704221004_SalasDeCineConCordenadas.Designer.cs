@@ -13,8 +13,8 @@ using PeliculasAPIs;
 namespace PeliculasAPIs.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260703021736_SalasUbicaciones")]
-    partial class SalasUbicaciones
+    [Migration("20260704221004_SalasDeCineConCordenadas")]
+    partial class SalasDeCineConCordenadas
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -316,12 +316,31 @@ namespace PeliculasAPIs.Migrations
                         .HasColumnType("nvarchar(120)");
 
                     b.Property<Point>("Ubicacion")
-                        .IsRequired()
                         .HasColumnType("geography");
 
                     b.HasKey("Id");
 
                     b.ToTable("SalasDeCine");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 4,
+                            Nombre = "Sambil",
+                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-74.006 40.7128)")
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Nombre = "Megacentro",
+                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-74.006 40.7128)")
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Nombre = "Village East Cinema",
+                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-74.006 40.7128)")
+                        });
                 });
 
             modelBuilder.Entity("PeliculasAPIs.Entidades.PeliculasActores", b =>
@@ -371,7 +390,7 @@ namespace PeliculasAPIs.Migrations
                         .IsRequired();
 
                     b.HasOne("PeliculasAPIs.Entidades.SalaDeCine", "SalaDeCine")
-                        .WithMany("PeliculasSalasDeCine")
+                        .WithMany("PeliculasSalasDeCines")
                         .HasForeignKey("SalaDeCineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -402,7 +421,7 @@ namespace PeliculasAPIs.Migrations
 
             modelBuilder.Entity("PeliculasAPIs.Entidades.SalaDeCine", b =>
                 {
-                    b.Navigation("PeliculasSalasDeCine");
+                    b.Navigation("PeliculasSalasDeCines");
                 });
 #pragma warning restore 612, 618
         }

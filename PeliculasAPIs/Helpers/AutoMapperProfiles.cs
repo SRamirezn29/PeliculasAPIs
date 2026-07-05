@@ -1,19 +1,34 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Options;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Index.Strtree;
+using NetTopologySuite.Utilities;
 using PeliculasAPIs.DTOs;
 using PeliculasAPIs.Entidades;
+using System.Runtime.CompilerServices;
 
 namespace PeliculasAPIs.Helpers
 {
     public class AutoMapperProfiles : Profile
     {
-        public AutoMapperProfiles()
+        public AutoMapperProfiles(GeometryFactory geometryFactory)
         {
             CreateMap<Genero, GeneroDTO>().ReverseMap();
             CreateMap<GeneroCreacionDTO, Genero>().ReverseMap();
 
-            CreateMap<SalaDeCine, SalaDeCineDTO>().ReverseMap();
-            CreateMap<SalaDeCineCreacionDTO, SalaDeCine>().ReverseMap();
+            CreateMap<SalaDeCine, SalaDeCineDTO>()
+                .ForMember(x => x.Latitud, x => x.MapFrom(y => y.Ubicacion.Y))
+                .ForMember(x => x.Longitud, x => x.MapFrom(s => s.Ubicacion.X));
+
+
+            CreateMap<SalaDeCineCreacionDTO, SalaDeCine>()
+                .ForMember(x => x.Ubicacion, x => x.MapFrom(y => 
+                geometryFactory.CreatePoint(new Coordinate(y.Longitud, y.Latitud))));
+
+            CreateMap<SalaDeCineCreacionDTO, SalaDeCine>()
+                .ForMember(x => x.Ubicacion, x => x.MapFrom(y =>
+                geometryFactory.CreatePoint(new Coordinate(y.Longitud, y.Latitud))));
 
             CreateMap<Actor, ActorDTO>().ReverseMap();
             CreateMap<ActorCreacionDTO, Actor>().ForMember(a => a.Foto, options => options.Ignore());

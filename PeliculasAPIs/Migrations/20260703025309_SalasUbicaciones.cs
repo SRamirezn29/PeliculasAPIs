@@ -15,7 +15,7 @@ namespace PeliculasAPIs.Migrations
                 name: "Ubicacion",
                 table: "SalasDeCine",
                 type: "geography",
-                nullable: false);
+                nullable: true);
         }
 
         /// <inheritdoc />

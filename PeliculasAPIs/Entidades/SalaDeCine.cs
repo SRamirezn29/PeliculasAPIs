@@ -1,6 +1,6 @@
-﻿
+﻿using NetTopologySuite.Geometries;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
+
 
 namespace PeliculasAPIs.Entidades
 {
@@ -10,7 +10,7 @@ namespace PeliculasAPIs.Entidades
         [Required]
         [StringLength(120)]
         public string Nombre { get; set; }
-        public  Point Ubicacion { get; set; }
+        public  Point? Ubicacion { get; set; }
         public List<PeliculasSalasDeCine> PeliculasSalasDeCines { get; set; }
     }
 }

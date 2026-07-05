@@ -1,11 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using PeliculasAPIs.Entidades;
 using PeliculasAPIs.Migrations;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PeliculasAPIs
 {
-    public class ApplicationDbContext:DbContext
+    public class ApplicationDbContext: IdentityDbContext 
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -24,6 +27,16 @@ namespace PeliculasAPIs
 
         public void SeedData(ModelBuilder modelBuilder)
         {
+            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+            modelBuilder.Entity<SalaDeCine>()
+           .HasData(new List<SalaDeCine>
+            {
+                new SalaDeCine{Id = 4, Nombre = "Sambil", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-74.0060, 40.7128))},
+                new SalaDeCine{Id = 5, Nombre = "Megacentro", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-74.0060, 40.7128))},
+                new SalaDeCine{Id = 6, Nombre = "Village East Cinema", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-74.0060, 40.7128))}
+            });
+
+
             var aventura = new Genero() { Id = 1, Nombre = "Aventura" };
             var comedia = new Genero() { Id = 2, Nombre = "Comedia" };
             var drama = new Genero() { Id = 3, Nombre = "Drama" };
