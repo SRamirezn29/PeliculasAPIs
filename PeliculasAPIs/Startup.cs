@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite;
@@ -29,6 +30,8 @@ namespace PeliculasAPIs
             services.AddHttpContextAccessor(); 
 
             services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
+            services.AddScoped<PeliculaExisteAttribute>();
+
             services.AddSingleton(provider =>
             
                 new MapperConfiguration(config =>

@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using PeliculasAPIs.Entidades;
 using PeliculasAPIs.Migrations;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+
 
 namespace PeliculasAPIs
 {
@@ -173,5 +173,6 @@ namespace PeliculasAPIs
         public DbSet<PeliculasActores> PeliculasActores { get; set; }
         public DbSet<PeliculasGenero> PeliculasGeneros { get; set; }
         public DbSet<SalaDeCine> SalasDeCine { get; set; }
+        public DbSet<Review > Reviews { get; set; }
     }
 }

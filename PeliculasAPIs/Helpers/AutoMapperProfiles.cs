@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
@@ -16,6 +17,14 @@ namespace PeliculasAPIs.Helpers
         {
             CreateMap<Genero, GeneroDTO>().ReverseMap();
             CreateMap<GeneroCreacionDTO, Genero>().ReverseMap();
+
+            CreateMap<Review, ReviewDTO>().
+                ForMember(x => x.NombreUsuario, x => x.MapFrom(y => y.Usuario.UserName));
+
+            CreateMap<ReviewDTO, ReviewDTO>();
+            CreateMap<ReviewCreasionDTO, Review>();
+
+            CreateMap<IdentityUser, UsuarioDTO>();
 
             CreateMap<SalaDeCine, SalaDeCineDTO>()
                 .ForMember(x => x.Latitud, x => x.MapFrom(y => y.Ubicacion.Y))
