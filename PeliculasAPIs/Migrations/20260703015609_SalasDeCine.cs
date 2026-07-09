@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
@@ -7,6 +8,8 @@ namespace PeliculasAPIs.Migrations
     /// <inheritdoc />
     public partial class SalasDeCine : Migration
     {
+        public Point Ubicacion;
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
